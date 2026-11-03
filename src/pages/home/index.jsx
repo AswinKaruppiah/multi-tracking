@@ -12,7 +12,7 @@ export default function HomePage() {
   };
 
   return (
-    <SafeAreaView edges={["bottom"]} className="flex-1 pb-4">
+    <SafeAreaView edges={["bottom"]} className="flex-1 pb-4 bg-brand-white">
       <HomeView onGetStarted={handleGetStarted} onJoin={handleJoin} />
     </SafeAreaView>
   );
