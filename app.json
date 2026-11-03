@@ -31,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#E8E8E8",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
@@ -39,6 +39,7 @@
     ],
     "experiments": {
       "reactCompiler": true
-    }
+    },
+    "backgroundColor": "#E8E8E8"
   }
 }
