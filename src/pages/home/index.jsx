@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { HomeView } from "../../sections/home";
 
 export default function HomePage() {
@@ -8,10 +8,8 @@ export default function HomePage() {
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-brand-gray px-4 pt-2 pb-4">
-        <HomeView onGetStarted={handleGetStarted} />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <SafeAreaView edges={["bottom"]} className="flex-1 pb-4">
+      <HomeView onGetStarted={handleGetStarted} />
+    </SafeAreaView>
   );
 }
