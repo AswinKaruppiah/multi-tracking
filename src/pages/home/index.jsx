@@ -7,9 +7,13 @@ export default function HomePage() {
     console.log("Get started tapped");
   };
 
+  const handleJoin = () => {
+    console.log("Join tapped");
+  };
+
   return (
     <SafeAreaView edges={["bottom"]} className="flex-1 pb-4">
-      <HomeView onGetStarted={handleGetStarted} />
+      <HomeView onGetStarted={handleGetStarted} onJoin={handleJoin} />
     </SafeAreaView>
   );
 }

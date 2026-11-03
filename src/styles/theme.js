@@ -7,6 +7,11 @@ const colors = {
   },
 };
 
+// CSS gradient strings for React Native's experimental_backgroundImage (NativeWind has no native gradient classes).
+const gradients = {
+  mono: `linear-gradient(135deg, ${colors.brand.black} 30%, ${colors.brand.gray} 130%)`,
+};
+
 // Keys are the font family names registered in src/styles/fonts.js.
 const fontFamily = {
   'helvetica-thin': ['HelveticaNeue-Thin'],
@@ -17,4 +22,4 @@ const fontFamily = {
   'helvetica-black': ['HelveticaNeue-Black'],
 };
 
-module.exports = { colors, fontFamily };
+module.exports = { colors, gradients, fontFamily };
