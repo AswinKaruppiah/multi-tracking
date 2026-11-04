@@ -1,11 +1,7 @@
 import { Camera, Map, Marker } from "@maplibre/maplibre-react-native";
 import { Text, View } from "react-native";
 
-// Free OpenStreetMap-based style from OpenFreeMap — no API key needed.
-const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
-
-// [longitude, latitude] the map opens on.
-const DEFAULT_CENTER = [80.2707, 13.0827];
+import { DEFAULT_CENTER, MAP_STYLE } from "@/constants/map";
 
 export default function HomeHero({ userLngLat }) {
   return (
@@ -21,7 +17,8 @@ export default function HomeHero({ userLngLat }) {
         <Camera
           initialViewState={{ center: DEFAULT_CENTER, zoom: 12 }}
           center={userLngLat ?? undefined}
-          zoom={userLngLat ? 15 : undefined}
+          zoom={15}
+          pitch={60}
         />
 
         {userLngLat && (

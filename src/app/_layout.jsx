@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
+import { LocationProvider } from '@/context/LocationContext';
 import { fonts } from '@/styles/fonts';
 import { colors } from '@/styles/theme';
 
@@ -24,11 +25,13 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: colors.brand.gray },
-      }}
-    />
+    <LocationProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.brand.gray },
+        }}
+      />
+    </LocationProvider>
   );
 }

@@ -1,11 +1,10 @@
-import { Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import useUserLocation from "@/hooks/useUserLocation";
 
-// Placeholder — the trip screen is built next.
+import { TripMap } from "../../sections/trip";
+
 export default function TripPage() {
-  return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-brand-white">
-      <Text className="font-helvetica text-base text-brand-black">Trip</Text>
-    </SafeAreaView>
-  );
+  // Shared with Home through LocationProvider, so the map opens on the user.
+  const { userLngLat } = useUserLocation();
+
+  return <TripMap userLngLat={userLngLat} />;
 }
