@@ -19,6 +19,9 @@ export default function HomeHero({ userLngLat }) {
           center={userLngLat ?? undefined}
           zoom={15}
           pitch={60}
+          // Animate camera changes instead of jumping.
+          duration={1500}
+          easing="fly"
         />
 
         {userLngLat && (
