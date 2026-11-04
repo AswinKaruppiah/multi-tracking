@@ -1,5 +1,5 @@
 import * as Location from "expo-location";
-import { createContext, useState } from "react";
+import { createContext, useCallback, useState } from "react";
 import { Alert, Linking, Platform } from "react-native";
 
 export const LocationContext = createContext(null);
@@ -11,6 +11,30 @@ export function LocationProvider({ children }) {
   const [userLngLat, setUserLngLat] = useState(null);
   // True while waiting on the GPS fix, which can take a few seconds.
   const [locating, setLocating] = useState(false);
+
+  // Keeps userLngLat live as the user moves. Returns a function that stops it,
+  // so a screen can use it directly as its effect: useEffect(() => watchUser(), []).
+  const watchUser = useCallback(() => {
+    let subscription = null;
+    let stopped = false;
+
+    Location.watchPositionAsync(
+      // New position after moving 5 m — no jitter while standing still.
+      { accuracy: Location.Accuracy.High, distanceInterval: 5 },
+      ({ coords }) => setUserLngLat([coords.longitude, coords.latitude]),
+    )
+      .then((sub) => {
+        // The screen may have closed before watching started.
+        if (stopped) sub.remove();
+        else subscription = sub;
+      })
+      .catch(() => {});
+
+    return () => {
+      stopped = true;
+      subscription?.remove();
+    };
+  }, []);
 
   // Resolves to [longitude, latitude], or null if location isn't available.
   async function locateUser() {
@@ -74,7 +98,7 @@ export function LocationProvider({ children }) {
   }
 
   return (
-    <LocationContext.Provider value={{ userLngLat, locating, locateUser }}>
+    <LocationContext.Provider value={{ userLngLat, locating, locateUser, watchUser }}>
       {children}
     </LocationContext.Provider>
   );
