@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { HomeView } from "../../sections/home";
+import HomeView from "@/sections/home/HomeView";
 
 export default function HomePage() {
   return (

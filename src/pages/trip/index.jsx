@@ -1,10 +1,5 @@
-import useUserLocation from "@/hooks/useUserLocation";
-
-import { TripMap } from "../../sections/trip";
+import TripView from "@/sections/trip/TripView";
 
 export default function TripPage() {
-  // Shared with Home through LocationProvider, so the map opens on the user.
-  const { userLngLat } = useUserLocation();
-
-  return <TripMap userLngLat={userLngLat} />;
+  return <TripView />;
 }
