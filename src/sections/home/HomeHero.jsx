@@ -1,4 +1,4 @@
-import { Camera, Map } from "@maplibre/maplibre-react-native";
+import { Camera, Map, Marker } from "@maplibre/maplibre-react-native";
 import { Text, View } from "react-native";
 
 // Free OpenStreetMap-based style from OpenFreeMap — no API key needed.
@@ -7,7 +7,7 @@ const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 // [longitude, latitude] the map opens on.
 const DEFAULT_CENTER = [80.2707, 13.0827];
 
-export default function HomeHero() {
+export default function HomeHero({ userLngLat }) {
   return (
     <View className="flex-[7] overflow-hidden rounded-b-[32px]">
       {/* TextureView so the rounded corners clip the map on Android. */}
@@ -18,7 +18,17 @@ export default function HomeHero() {
         compass={false}
         attribution={false}
       >
-        <Camera initialViewState={{ center: DEFAULT_CENTER, zoom: 12 }} />
+        <Camera
+          initialViewState={{ center: DEFAULT_CENTER, zoom: 12 }}
+          center={userLngLat ?? undefined}
+          zoom={userLngLat ? 15 : undefined}
+        />
+
+        {userLngLat && (
+          <Marker lngLat={userLngLat}>
+            <View className="h-6 w-6 rounded-full border-[3px] border-white bg-blue-500" />
+          </Marker>
+        )}
       </Map>
 
       {/* Replaces the hidden ⓘ button — OpenStreetMap's licence requires visible credit. */}
