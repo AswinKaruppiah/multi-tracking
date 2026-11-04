@@ -49,9 +49,16 @@ export default function useUserLocation() {
       }
     }
 
+    // Already found once — the checks above confirm it still works, so no
+    // need to wait on the GPS again.
+    if (userLngLat) return userLngLat;
+
     setLocating(true);
     try {
-      const { coords } = await Location.getCurrentPositionAsync();
+      // The phone's cached position is instant; a fresh GPS fix can take seconds.
+      const { coords } =
+        (await Location.getLastKnownPositionAsync()) ??
+        (await Location.getCurrentPositionAsync());
       const lngLat = [coords.longitude, coords.latitude];
       setUserLngLat(lngLat);
       return lngLat;

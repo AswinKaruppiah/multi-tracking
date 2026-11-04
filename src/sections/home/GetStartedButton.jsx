@@ -1,9 +1,9 @@
-import { ActivityIndicator, Pressable, Text } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import Show from "@/components/Show";
 import { colors } from "@/styles/theme";
 
-export default function GetStartedButton({ onPress, loading }) {
+export default function GetStartedButton({ onPress, loading, loadingText }) {
   return (
     <Pressable
       onPress={onPress}
@@ -12,7 +12,12 @@ export default function GetStartedButton({ onPress, loading }) {
     >
       <Show>
         <Show.If isTrue={loading}>
-          <ActivityIndicator color={colors.brand.white} />
+          <View className="flex-row items-center justify-center gap-2">
+            <ActivityIndicator color={colors.brand.white} />
+            <Text className="font-helvetica text-base text-brand-white">
+              {loadingText}
+            </Text>
+          </View>
         </Show.If>
         <Show.Else>
           <Text className="text-center font-helvetica text-base text-brand-white">
