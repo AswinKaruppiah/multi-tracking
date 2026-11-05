@@ -16,6 +16,9 @@ SplashScreen.preventAutoHideAsync();
 // Light theme only — HeroUI reads its colors from the Uniwind theme.
 Uniwind.setTheme('light');
 
+// Hides HeroUI's "Styling Principles" info log on every app start.
+const heroUIConfig = { devInfo: { stylingPrinciples: false } };
+
 export default function RootLayout() {
   const [loaded, error] = useFonts(fonts);
 
@@ -36,7 +39,7 @@ export default function RootLayout() {
         style={{ flex: 1 }}
         onChange={({ insets }) => Uniwind.updateInsets(insets)}
       >
-        <HeroUINativeProvider>
+        <HeroUINativeProvider config={heroUIConfig}>
           <LocationProvider>
             <Stack
               screenOptions={{

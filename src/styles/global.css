@@ -12,6 +12,9 @@
   --color-brand-black: #000000;
   --color-brand-white: #FFFFFF;
 
+  /* Soft shadow for controls floating over the map → `shadow-float`. */
+  --shadow-float: 0 6px 20px rgba(0, 0, 0, 0.15);
+
   /* Font names registered in src/styles/fonts.js. */
   --font-helvetica-thin: 'HelveticaNeue-Thin';
   --font-helvetica-light: 'HelveticaNeue-Light';
