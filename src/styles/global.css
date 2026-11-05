@@ -1,3 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'uniwind';
+
+@import 'heroui-native/styles';
+
+/* global.css lives in src/styles, so point Tailwind at the whole src tree. */
+@source '../';
+
+/* Design tokens — keep in sync with src/styles/theme.js (used from JS). */
+@theme {
+  --color-brand-gray: #E8E8E8;
+  --color-brand-black: #000000;
+  --color-brand-white: #FFFFFF;
+
+  /* Font names registered in src/styles/fonts.js. */
+  --font-helvetica-thin: 'HelveticaNeue-Thin';
+  --font-helvetica-light: 'HelveticaNeue-Light';
+  --font-helvetica: 'HelveticaNeue-Roman';
+  --font-helvetica-medium: 'HelveticaNeue-Medium';
+  --font-helvetica-bold: 'HelveticaNeue-Bold';
+  --font-helvetica-black: 'HelveticaNeue-Black';
+}

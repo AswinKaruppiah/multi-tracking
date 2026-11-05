@@ -1,6 +1,11 @@
 const { getDefaultConfig } = require('expo/metro-config');
-const { withNativeWind } = require('nativewind/metro');
+const { withUniwindConfig } = require('uniwind/metro');
 
 const config = getDefaultConfig(__dirname);
 
-module.exports = withNativeWind(config, { input: './src/styles/global.css' });
+// withUniwindConfig must stay the outermost wrapper. rem: 14 keeps NativeWind's sizing.
+module.exports = withUniwindConfig(config, {
+  cssEntryFile: './src/styles/global.css',
+  dtsFile: './src/uniwind-types.d.ts',
+  polyfills: { rem: 14 },
+});

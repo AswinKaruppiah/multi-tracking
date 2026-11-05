@@ -1,6 +1,7 @@
 import * as Location from "expo-location";
+import { useToast } from "heroui-native";
 import { createContext, useCallback, useState } from "react";
-import { Alert, Linking, Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 
 export const LocationContext = createContext(null);
 
@@ -11,6 +12,7 @@ export function LocationProvider({ children }) {
   const [userLngLat, setUserLngLat] = useState(null);
   // True while waiting on the GPS fix, which can take a few seconds.
   const [locating, setLocating] = useState(false);
+  const { toast } = useToast();
 
   // Keeps userLngLat live as the user moves. Returns a function that stops it,
   // so a screen can use it directly as its effect: useEffect(() => watchUser(), []).
@@ -41,21 +43,48 @@ export function LocationProvider({ children }) {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (permission.status !== "granted") {
       if (permission.canAskAgain) {
-        Alert.alert(
-          "Location needed",
-          "A trip can't start without your location.",
-        );
+        toast.show({
+          variant: "warning",
+          label: "Location needed",
+          description: "A trip can't start without your location.",
+        });
       } else {
         // "Don't ask again" was picked — only Settings can grant it now.
-        Alert.alert(
-          "Location is off",
-          "Allow location for this app in Settings to start a trip.",
-          [
-            { text: "Cancel", style: "cancel" },
-            { text: "Open Settings", onPress: () => Linking.openSettings() },
-          ],
-        );
+        toast.show({
+          variant: "danger",
+          label: "Location is off",
+          description:
+            "Allow location for this app in Settings to start a trip.",
+          actionLabel: "Settings",
+          onActionPress: ({ hide }) => {
+            hide();
+            Linking.openSettings();
+          },
+        });
       }
+      return null;
+    }
+
+    const isPrecise =
+      Platform.OS === "ios"
+        ? permission.ios?.accuracy === "full"
+        : Platform.OS === "android"
+          ? permission.android?.accuracy === "fine"
+          : true;
+
+    if (!isPrecise) {
+      setUserLngLat(null);
+      toast.show({
+        variant: "warning",
+        label: "Precise location needed",
+        description:
+          'Turn on "Use precise location" in Settings to start a trip.',
+        actionLabel: "Settings",
+        onActionPress: ({ hide }) => {
+          hide();
+          Linking.openSettings();
+        },
+      });
       return null;
     }
 
@@ -65,13 +94,19 @@ export function LocationProvider({ children }) {
           // Shows Android's in-app "Turn on location?" dialog.
           await Location.enableNetworkProviderAsync();
         } catch {
+          toast.show({
+            variant: "warning",
+            label: "Location is off",
+            description: "Turn on location to start a trip.",
+          });
           return null;
         }
       } else {
-        Alert.alert(
-          "Location Services are off",
-          "Turn on Location Services in Settings to start a trip.",
-        );
+        toast.show({
+          variant: "warning",
+          label: "Location Services are off",
+          description: "Turn on Location Services in Settings to start a trip.",
+        });
         return null;
       }
     }
@@ -90,7 +125,11 @@ export function LocationProvider({ children }) {
       setUserLngLat(lngLat);
       return lngLat;
     } catch {
-      Alert.alert("Couldn't find you", "Please try again in a moment.");
+      toast.show({
+        variant: "danger",
+        label: "Couldn't find you",
+        description: "Please try again in a moment.",
+      });
       return null;
     } finally {
       setLocating(false);
@@ -98,7 +137,9 @@ export function LocationProvider({ children }) {
   }
 
   return (
-    <LocationContext.Provider value={{ userLngLat, locating, locateUser, watchUser }}>
+    <LocationContext.Provider
+      value={{ userLngLat, locating, locateUser, watchUser }}
+    >
       {children}
     </LocationContext.Provider>
   );

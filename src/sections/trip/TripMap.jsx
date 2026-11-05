@@ -1,4 +1,4 @@
-import { Camera, Map, Marker } from "@maplibre/maplibre-react-native";
+import { Camera, Map, UserLocation } from "@maplibre/maplibre-react-native";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -20,11 +20,8 @@ export default function TripMap({ userLngLat, cameraRef }) {
           initialViewState={{ center: userLngLat ?? DEFAULT_CENTER, zoom: 15 }}
         />
 
-        {userLngLat && (
-          <Marker lngLat={userLngLat}>
-            <View className="h-6 w-6 rounded-full border-[3px] border-white bg-blue-500" />
-          </Marker>
-        )}
+        {/* MapLibre's own dot — reads GPS natively and glides between positions. */}
+        <UserLocation animated accuracy heading />
       </Map>
 
       {/* OpenStreetMap's licence requires visible credit. */}
