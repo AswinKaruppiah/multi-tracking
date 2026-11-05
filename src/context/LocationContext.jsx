@@ -1,6 +1,6 @@
 import * as Location from "expo-location";
 import { useToast } from "heroui-native";
-import { createContext, useCallback, useState } from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
 import { Linking, Platform } from "react-native";
 
 export const LocationContext = createContext(null);
@@ -21,8 +21,8 @@ export function LocationProvider({ children }) {
     let stopped = false;
 
     Location.watchPositionAsync(
-      // New position after moving 5 m — no jitter while standing still.
-      { accuracy: Location.Accuracy.High, distanceInterval: 5 },
+      // Real-time: a new fix about every second, or after moving 1 m.
+      { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 1 },
       ({ coords }) => setUserLngLat([coords.longitude, coords.latitude]),
     )
       .then((sub) => {
@@ -39,7 +39,7 @@ export function LocationProvider({ children }) {
   }, []);
 
   // Resolves to [longitude, latitude], or null if location isn't available.
-  async function locateUser() {
+  const locateUser = useCallback(async () => {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (permission.status !== "granted") {
       if (permission.canAskAgain) {
@@ -134,12 +134,16 @@ export function LocationProvider({ children }) {
     } finally {
       setLocating(false);
     }
-  }
+  }, [userLngLat, toast]);
+
+  // Stable value, so consumers re-render only when something in it changes.
+  const value = useMemo(
+    () => ({ userLngLat, locating, locateUser, watchUser }),
+    [userLngLat, locating, locateUser, watchUser],
+  );
 
   return (
-    <LocationContext.Provider
-      value={{ userLngLat, locating, locateUser, watchUser }}
-    >
+    <LocationContext.Provider value={value}>
       {children}
     </LocationContext.Provider>
   );

@@ -1,6 +1,7 @@
 import { Camera, Map, Marker } from "@maplibre/maplibre-react-native";
 import { Text, View } from "react-native";
 
+import UserDot from "@/components/UserDot";
 import { DEFAULT_CENTER, MAP_STYLE } from "@/constants/map";
 
 export default function HomeHero({ userLngLat }) {
@@ -26,7 +27,7 @@ export default function HomeHero({ userLngLat }) {
 
         {userLngLat && (
           <Marker lngLat={userLngLat}>
-            <View className="h-6 w-6 rounded-full border-[3px] border-white bg-blue-500" />
+            <UserDot />
           </Marker>
         )}
       </Map>

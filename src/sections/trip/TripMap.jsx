@@ -1,12 +1,14 @@
-import { Camera, Map, UserLocation } from "@maplibre/maplibre-react-native";
+import { Camera, Map } from "@maplibre/maplibre-react-native";
+import { memo } from "react";
 import { Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { DEFAULT_CENTER, MAP_STYLE } from "@/constants/map";
+import { MAP_STYLE } from "@/constants/map";
 
-export default function TripMap({ userLngLat, cameraRef }) {
-  const insets = useSafeAreaInsets();
+import UserMarker from "./UserMarker";
 
+// Memoized: props never change after mount, so GPS updates re-render only
+// UserMarker, never the map itself.
+function TripMap({ cameraRef, initialCenter }) {
   return (
     <View className="flex-1">
       <Map
@@ -17,21 +19,21 @@ export default function TripMap({ userLngLat, cameraRef }) {
       >
         <Camera
           ref={cameraRef}
-          initialViewState={{ center: userLngLat ?? DEFAULT_CENTER, zoom: 15 }}
+          initialViewState={{ center: initialCenter, zoom: 15 }}
         />
 
-        {/* MapLibre's own dot — reads GPS natively and glides between positions. */}
-        <UserLocation animated accuracy heading />
+        <UserMarker />
       </Map>
 
       {/* OpenStreetMap's licence requires visible credit. */}
       <Text
         pointerEvents="none"
-        className="absolute right-4 text-[10px] text-black/60"
-        style={{ bottom: insets.bottom + 8 }}
+        className="absolute right-4 bottom-safe-offset-2 text-[10px] text-black/60"
       >
         © OpenStreetMap
       </Text>
     </View>
   );
 }
+
+export default memo(TripMap);

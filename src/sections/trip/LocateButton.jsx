@@ -1,7 +1,8 @@
 import { LocateFixed } from "lucide-react-native";
+import { memo } from "react";
 import { Pressable } from "react-native";
 
-export default function LocateButton({ onPress }) {
+function LocateButton({ onPress }) {
   return (
     <Pressable
       onPress={onPress}
@@ -12,3 +13,5 @@ export default function LocateButton({ onPress }) {
     </Pressable>
   );
 }
+
+export default memo(LocateButton);
