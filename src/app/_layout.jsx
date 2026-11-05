@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { HeroUINativeProvider } from 'heroui-native';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaListener } from 'react-native-safe-area-context';
 import { Uniwind } from 'uniwind';
 
 import { LocationProvider } from '@/context/LocationContext';
@@ -30,16 +31,22 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <HeroUINativeProvider>
-        <LocationProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.brand.gray },
-            }}
-          />
-        </LocationProvider>
-      </HeroUINativeProvider>
+      {/* Feeds notch / home-bar sizes to Uniwind so pt-safe, pb-safe, etc. work. */}
+      <SafeAreaListener
+        style={{ flex: 1 }}
+        onChange={({ insets }) => Uniwind.updateInsets(insets)}
+      >
+        <HeroUINativeProvider>
+          <LocationProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.brand.gray },
+              }}
+            />
+          </LocationProvider>
+        </HeroUINativeProvider>
+      </SafeAreaListener>
     </GestureHandlerRootView>
   );
 }
