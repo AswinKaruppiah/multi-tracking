@@ -18,6 +18,13 @@ export default function TripView() {
   // Live location while this screen is open; GPS stops when it closes.
   useEffect(() => watchUser(), [watchUser]);
 
+  // Follow the user: move the map with each new position. 1 s linear matches
+  // UserMarker's glide, so the dot stays centred.
+  useEffect(() => {
+    if (!userLngLat) return;
+    cameraRef.current?.easeTo({ center: userLngLat, duration: 1000, easing: "linear" });
+  }, [userLngLat]);
+
   // Brings the map back to the user after they've panned away. Checks first
   // that permission is still given and the phone's location is on.
   const centerOnUser = useCallback(async () => {
