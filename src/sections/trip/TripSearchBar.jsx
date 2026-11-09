@@ -4,14 +4,15 @@ import { Pressable, TextInput, View } from "react-native";
 
 import Show from "@/components/Show";
 
-function TripSearchBar({ value, onChangeText, onSubmit, onClear }) {
+// Pressing the keyboard's search key just closes the keyboard (the default
+// for a single-line input); results already update as you type.
+function TripSearchBar({ value, onChangeText, onClear }) {
   return (
     <View className="px-3 h-16 flex-row items-center rounded-full bg-brand-white shadow-float">
       <Search size={30} color="rgba(0,0,0,0.5)" strokeWidth={1} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        onSubmitEditing={onSubmit}
         placeholder="Where to?"
         placeholderTextColor="rgba(0,0,0,0.4)"
         returnKeyType="search"
