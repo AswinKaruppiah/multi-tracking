@@ -42,21 +42,6 @@ export default function TripView() {
     });
   }, [userLngLat, following]);
 
-  // When a route appears, fit the camera so all of it is visible, with room
-  // for the search bar on top and the card at the bottom.
-  useEffect(() => {
-    if (!route) return;
-    cameraRef.current?.fitBounds(route.bounds, {
-      padding: {
-        top: insets.top + 110,
-        bottom: insets.bottom + 200,
-        left: 50,
-        right: 50,
-      },
-      duration: 800,
-    });
-  }, [route, insets]);
-
   // Brings the map back to the user after they've panned away. Checks first
   // that permission is still given and the phone's location is on.
   const centerOnUser = useCallback(async () => {
@@ -104,14 +89,24 @@ export default function TripView() {
   // The search bar's X removes the pin (and with it, the route).
   const clearDestination = useCallback(() => setDestination(null), []);
 
-  // Directions: get the road route from the user to the destination. The
-  // effect above fits the camera to it once it arrives.
+  // Directions: get the road route from the user to the destination, then fit
+  // the camera so all of it is visible.
   const showDirections = useCallback(async () => {
     const start = await locateUser();
     if (!start) return;
     setFollowing(false); // so following doesn't pull the camera off the route
     try {
-      await findRoute(start);
+      const route = await findRoute(start);
+      // Room for the search bar on top and the card at the bottom.
+      cameraRef.current?.fitBounds(route.bounds, {
+        padding: {
+          top: insets.top + 110,
+          bottom: insets.bottom + 200,
+          left: 50,
+          right: 50,
+        },
+        duration: 800,
+      });
     } catch {
       toast.show({
         variant: "danger",
@@ -119,7 +114,7 @@ export default function TripView() {
         description: "Check your connection and try again.",
       });
     }
-  }, [locateUser, findRoute, toast]);
+  }, [locateUser, findRoute, insets, toast]);
 
   return (
     <View className="flex-1">

@@ -9,7 +9,7 @@ export default function useRoute(destination) {
   const [answer, setAnswer] = useState({ to: null, route: null });
   const [loadingFor, setLoadingFor] = useState(null);
 
-  // Fetch the route from `start` ([lng, lat]). Throws if it fails.
+  // Fetch the route from `start` ([lng, lat]) and return it. Throws if it fails.
   const findRoute = useCallback(
     async (start) => {
       const to = destination;
@@ -17,6 +17,7 @@ export default function useRoute(destination) {
       try {
         const route = await fetchRoute(start, to.lngLat);
         setAnswer({ to, route });
+        return route;
       } finally {
         // Only clear if a newer request hasn't started meanwhile.
         setLoadingFor((current) => (current === to ? null : current));
