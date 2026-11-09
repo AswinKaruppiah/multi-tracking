@@ -1,10 +1,12 @@
-import { Search } from "lucide-react-native";
+import { Search, X } from "lucide-react-native";
 import { memo } from "react";
-import { TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 
-function TripSearchBar({ value, onChangeText, onSubmit }) {
+import Show from "@/components/Show";
+
+function TripSearchBar({ value, onChangeText, onSubmit, onClear }) {
   return (
-    <View className="absolute left-5 right-5 top-safe-offset-8 px-3 h-16 flex-row items-center rounded-full bg-brand-white shadow-float">
+    <View className="px-3 h-16 flex-row items-center rounded-full bg-brand-white shadow-float">
       <Search size={30} color="rgba(0,0,0,0.5)" strokeWidth={1} />
       <TextInput
         value={value}
@@ -15,6 +17,19 @@ function TripSearchBar({ value, onChangeText, onSubmit }) {
         returnKeyType="search"
         className="ml-3 flex-1 text-lg text-brand-black"
       />
+      {/* Only shown when there's something to clear. */}
+      <Show>
+        <Show.If isTrue={!!value}>
+          <Pressable
+            onPress={onClear}
+            hitSlop={8}
+            accessibilityLabel="Clear search"
+            className="h-10 w-10 items-center justify-center rounded-full active:bg-black/5"
+          >
+            <X size={22} color="rgba(0,0,0,0.5)" strokeWidth={1.5} />
+          </Pressable>
+        </Show.If>
+      </Show>
     </View>
   );
 }
