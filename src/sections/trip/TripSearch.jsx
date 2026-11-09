@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { View } from "react-native";
 
 import Show from "@/components/Show";
@@ -22,22 +22,30 @@ function TripSearch({ destination, near, onSelect, onClear, onType }) {
     setShowResults(false);
   }
 
-  const handleChangeText = (text) => {
-    setQuery(text);
-    setShowResults(true);
-    onType();
-  };
+  // useCallback: `near` changes every second, re-rendering this component.
+  // Stable handlers let the memo'd bar and list skip those renders.
+  const handleChangeText = useCallback(
+    (text) => {
+      setQuery(text);
+      setShowResults(true);
+      onType();
+    },
+    [onType],
+  );
 
-  const handleSelect = (place) => {
-    setShowResults(false);
-    onSelect(place);
-  };
+  const handleSelect = useCallback(
+    (place) => {
+      setShowResults(false);
+      onSelect(place);
+    },
+    [onSelect],
+  );
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setQuery("");
     setShowResults(false);
     onClear();
-  };
+  }, [onClear]);
 
   return (
     // Bar and results stacked together, so the list always sits right under
