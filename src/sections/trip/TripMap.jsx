@@ -4,7 +4,12 @@ import { Text, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 import Show from "@/components/Show";
-import { MAP_STYLE } from "@/constants/map";
+import {
+  MAP_ATTRIBUTION,
+  MAP_STYLE,
+  SATELLITE_ATTRIBUTION,
+  SATELLITE_STYLE,
+} from "@/constants/map";
 
 import DestinationMarker from "./DestinationMarker";
 import RouteLine from "./RouteLine";
@@ -17,6 +22,7 @@ function TripMap({
   initialCenter,
   destination,
   route,
+  satellite,
   onLongPress,
 }) {
   // Map rotation, so the heading cone still points the real-world direction.
@@ -36,7 +42,7 @@ function TripMap({
   return (
     <View className="flex-1">
       <Map
-        mapStyle={MAP_STYLE}
+        mapStyle={satellite ? SATELLITE_STYLE : MAP_STYLE}
         logo={false}
         compass={false}
         attribution={false}
@@ -63,12 +69,14 @@ function TripMap({
         <UserMarker bearing={bearing} />
       </Map>
 
-      {/* OpenStreetMap's licence requires visible credit. */}
+      {/* The map data's licence requires visible credit. */}
       <Text
         pointerEvents="none"
-        className="absolute right-4 bottom-safe-offset-2 text-[10px] text-black/60"
+        className={`absolute right-4 bottom-safe-offset-2 text-[10px] ${
+          satellite ? "text-white/80" : "text-black/60"
+        }`}
       >
-        © OpenStreetMap
+        {satellite ? SATELLITE_ATTRIBUTION : MAP_ATTRIBUTION}
       </Text>
     </View>
   );

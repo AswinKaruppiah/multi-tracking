@@ -10,6 +10,7 @@ import useUserLocation from "@/hooks/useUserLocation";
 
 import DestinationCard from "./DestinationCard";
 import LocateButton from "./LocateButton";
+import MapStyleButton from "./MapStyleButton";
 import TripMap from "./TripMap";
 import TripSearch from "./TripSearch";
 
@@ -20,6 +21,10 @@ export default function TripView() {
   const [destination, setDestination] = useState(null);
   // When on, the map moves with the user. Off while looking at a destination.
   const [following, setFollowing] = useState(true);
+  // Satellite photos (default) or the street map. Satellite shows buildings
+  // OpenStreetMap hasn't mapped yet.
+  const [satellite, setSatellite] = useState(true);
+  const toggleSatellite = useCallback(() => setSatellite((on) => !on), []);
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
   // Where the map opens — read once so later GPS updates don't touch TripMap.
@@ -123,6 +128,7 @@ export default function TripView() {
         initialCenter={initialCenter}
         destination={destination}
         route={route}
+        satellite={satellite}
         onLongPress={handleLongPress}
       />
       <TripSearch
@@ -132,7 +138,15 @@ export default function TripView() {
         onClear={clearDestination}
         onType={pauseFollowing}
       />
-      <LocateButton onPress={centerOnUser} raised={!!destination} />
+      {/* Map buttons, stacked bottom-left; lifted above the destination card. */}
+      <View
+        className={`absolute left-5 gap-3 ${
+          destination ? "bottom-safe-offset-44" : "bottom-safe-offset-5"
+        }`}
+      >
+        <MapStyleButton satellite={satellite} onPress={toggleSatellite} />
+        <LocateButton onPress={centerOnUser} />
+      </View>
       <Show>
         <Show.If isTrue={!!destination}>
           <DestinationCard
