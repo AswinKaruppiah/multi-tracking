@@ -1,18 +1,15 @@
 import { Camera, Map } from "@maplibre/maplibre-react-native";
 import { memo, useCallback } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 import Show from "@/components/Show";
-import {
-  MAP_ATTRIBUTION,
-  MAP_STYLE,
-  SATELLITE_ATTRIBUTION,
-  SATELLITE_STYLE,
-} from "@/constants/map";
+import { MAP_STYLE } from "@/constants/map";
+import useSatelliteStyle from "@/hooks/useSatelliteStyle";
 
 import DestinationMarker from "./DestinationMarker";
 import RouteLine from "./RouteLine";
+import SatelliteStatus from "./SatelliteStatus";
 import UserMarker from "./UserMarker";
 
 // Memoized: re-renders only when the destination changes. GPS updates
@@ -24,10 +21,21 @@ function TripMap({
   route,
   satellite,
   onLongPress,
+  onShowStreetMap,
 }) {
   // Map rotation, so the heading cone still points the real-world direction.
   // A shared value: rotating the map doesn't re-render anything.
   const bearing = useSharedValue(0);
+
+  // ArcGIS satellite style. Until it's ready (or if it fails),
+  // SatelliteStatus covers the map.
+  const {
+    style: satelliteStyle,
+    error: satelliteError,
+    retry: retrySatellite,
+  } = useSatelliteStyle(satellite);
+  const showSatellite = satellite && !!satelliteStyle;
+
   const handleRegionChange = useCallback(
     (event) => bearing.set(event.nativeEvent.bearing),
     [bearing],
@@ -42,7 +50,8 @@ function TripMap({
   return (
     <View className="flex-1">
       <Map
-        mapStyle={satellite ? SATELLITE_STYLE : MAP_STYLE}
+        // Street map underneath while satellite loads; it's covered anyway.
+        mapStyle={showSatellite ? satelliteStyle : MAP_STYLE}
         logo={false}
         compass={false}
         attribution={false}
@@ -52,7 +61,7 @@ function TripMap({
       >
         <Camera
           ref={cameraRef}
-          initialViewState={{ center: initialCenter, zoom: 15 }}
+          initialViewState={{ center: initialCenter, zoom: 17 }}
         />
 
         {/* `?.`: Show.If builds its children even when false. */}
@@ -69,15 +78,15 @@ function TripMap({
         <UserMarker bearing={bearing} />
       </Map>
 
-      {/* The map data's licence requires visible credit. */}
-      <Text
-        pointerEvents="none"
-        className={`absolute right-4 bottom-safe-offset-2 text-[10px] ${
-          satellite ? "text-white/80" : "text-black/60"
-        }`}
-      >
-        {satellite ? SATELLITE_ATTRIBUTION : MAP_ATTRIBUTION}
-      </Text>
+      <Show>
+        <Show.If isTrue={satellite && !satelliteStyle}>
+          <SatelliteStatus
+            error={satelliteError}
+            onRetry={retrySatellite}
+            onShowStreetMap={onShowStreetMap}
+          />
+        </Show.If>
+      </Show>
     </View>
   );
 }

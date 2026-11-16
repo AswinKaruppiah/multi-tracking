@@ -9,12 +9,16 @@ import { SafeAreaListener } from 'react-native-safe-area-context';
 import { Uniwind } from 'uniwind';
 
 import { LocationProvider } from '@/context/LocationContext';
+import { loadSatelliteStyle } from '@/services/satelliteStyle';
 import { fonts } from '@/styles/fonts';
 import { colors } from '@/styles/theme';
 
 SplashScreen.preventAutoHideAsync();
 // Light theme only — HeroUI reads its colors from the Uniwind theme.
 Uniwind.setTheme('light');
+// Start downloading the satellite map style now, so the trip screen rarely
+// waits for it. Errors are handled there (it retries and shows them).
+loadSatelliteStyle().catch(() => {});
 
 // Hides HeroUI's "Styling Principles" info log on every app start.
 const heroUIConfig = { devInfo: { stylingPrinciples: false } };

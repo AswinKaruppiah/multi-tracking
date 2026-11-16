@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "heroui-native";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Keyboard, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -25,6 +25,7 @@ export default function TripView() {
   // OpenStreetMap hasn't mapped yet.
   const [satellite, setSatellite] = useState(true);
   const toggleSatellite = useCallback(() => setSatellite((on) => !on), []);
+  const showStreetMap = useCallback(() => setSatellite(false), []);
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
   // Where the map opens — read once so later GPS updates don't touch TripMap.
@@ -53,7 +54,7 @@ export default function TripView() {
     const lngLat = await locateUser();
     if (!lngLat) return;
     setFollowing(true);
-    cameraRef.current?.easeTo({ center: lngLat, zoom: 15, duration: 400 });
+    cameraRef.current?.easeTo({ center: lngLat, zoom: 17, duration: 400 });
   }, [locateUser]);
 
   // Save the place and drop the pin. Stops following so the map doesn't
@@ -130,6 +131,7 @@ export default function TripView() {
         route={route}
         satellite={satellite}
         onLongPress={handleLongPress}
+        onShowStreetMap={showStreetMap}
       />
       <TripSearch
         destination={destination}

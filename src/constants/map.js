@@ -2,36 +2,22 @@
 export const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
 // Satellite photos show every real building, even ones OpenStreetMap hasn't
-// mapped yet. Esri's free tiles (no key) with road and place-name labels on
-// top. Before release, add a free ArcGIS Location Platform key, since keyless
-// Esri tiles are meant for development.
-const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services";
-const esriSource = (service, maxzoom = 19) => ({
-  type: "raster",
-  tiles: [`${ESRI}/${service}/MapServer/tile/{z}/{y}/{x}`],
-  tileSize: 256,
-  maxzoom,
-});
+// mapped yet. ArcGIS's "imagery" style: photos plus road and place-name
+// labels, using EXPO_PUBLIC_ARCGIS_API_KEY (in .env). Free for 2M tiles a
+// month; with pay-as-you-go off (the default) it stops at the limit, no bill.
+const ARCGIS_API_KEY = process.env.EXPO_PUBLIC_ARCGIS_API_KEY;
+const ARCGIS_STYLES =
+  "https://basemapstyles-api.arcgis.com/arcgis/rest/services/styles/v2/styles";
 
-export const SATELLITE_STYLE = {
-  version: 8,
-  sources: {
-    // Zoom 18 max: outside city centres Esri has no deeper photos and sends a
-    // gray "no data" tile. Past 18 the map enlarges the zoom-18 photo instead.
-    imagery: esriSource("World_Imagery", 18),
-    roads: esriSource("Reference/World_Transportation"),
-    places: esriSource("Reference/World_Boundaries_and_Places"),
-  },
-  layers: [
-    { id: "imagery", type: "raster", source: "imagery" },
-    { id: "roads", type: "raster", source: "roads" },
-    { id: "places", type: "raster", source: "places" },
-  ],
-};
+// Not passed to the map directly: useSatelliteStyle downloads and fixes it up
+// first. Without a key ArcGIS rejects it, and the app shows an error.
+export const ARCGIS_SATELLITE_STYLE_URL = `${ARCGIS_STYLES}/arcgis/imagery?token=${encodeURIComponent(ARCGIS_API_KEY ?? "")}`;
 
-// Credit each map must show (licence requirement).
+// Credit each map must show (licence requirement). The ArcGIS labels are
+// partly OpenStreetMap data, so it's credited too.
 export const MAP_ATTRIBUTION = "© OpenStreetMap contributors";
-export const SATELLITE_ATTRIBUTION = "Esri, Maxar, Earthstar Geographics";
+export const SATELLITE_ATTRIBUTION =
+  "Powered by Esri | Esri, Vantor, Earthstar Geographics, © OpenStreetMap contributors";
 
 // [longitude, latitude] maps open on when the user's position is unknown.
 export const DEFAULT_CENTER = [80.2707, 13.0827];
