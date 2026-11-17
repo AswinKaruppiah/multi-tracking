@@ -48,10 +48,13 @@ function TripMap({
   );
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-brand-gray">
       <Map
         // Street map underneath while satellite loads; it's covered anyway.
         mapStyle={showSatellite ? satelliteStyle : MAP_STYLE}
+        // Android's default surface view is black until its first frame;
+        // a texture view stays see-through, so the gray behind shows instead.
+        androidView="texture"
         logo={false}
         compass={false}
         attribution={false}

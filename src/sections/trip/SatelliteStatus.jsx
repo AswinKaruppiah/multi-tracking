@@ -10,7 +10,7 @@ function SatelliteStatus({ error, onRetry, onShowStreetMap }) {
   return (
     <View className="absolute inset-0 items-center justify-center bg-brand-gray px-5">
       <Show>
-        <Show.If isTrue={!error}>
+        <Show.If isTrue={error}>
           <View className="w-full items-center px-6">
             <View className="h-16 w-16 items-center justify-center rounded-full bg-brand-gray">
               <Satellite size={28} color="#000000" strokeWidth={1.75} />

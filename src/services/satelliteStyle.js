@@ -1,17 +1,26 @@
 import { ARCGIS_SATELLITE_STYLE_URL } from "@/constants/map";
+import { colors } from "@/styles/theme";
 
 // ArcGIS styles give each source both a ready `tiles` list and a `url` to an
 // ArcGIS server. Native MapLibre follows the `url`, gets ArcGIS's own format
 // instead of TileJSON, and fails with "source must have tiles". Dropping the
 // `url` makes it use the `tiles` list.
-function fixSources(style) {
+//
+// The style also has no background layer, so the map is black until the
+// photos arrive. A gray background (app colour) shows instead.
+function fixStyle(style) {
   const sources = Object.fromEntries(
     Object.entries(style.sources).map(([id, { url, ...source }]) => [
       id,
       source,
     ]),
   );
-  return { ...style, sources };
+  const background = {
+    id: "background",
+    type: "background",
+    paint: { "background-color": colors.brand.gray },
+  };
+  return { ...style, sources, layers: [background, ...style.layers] };
 }
 
 // One shared download per app run: started at app launch (root layout), so
@@ -26,7 +35,7 @@ export function loadSatelliteStyle() {
     .then((body) => {
       // A bad key comes back as { error: ... } with no sources.
       if (!body.sources) throw new Error("No ArcGIS style");
-      loadedStyle = fixSources(body);
+      loadedStyle = fixStyle(body);
       return loadedStyle;
     })
     .catch((error) => {
