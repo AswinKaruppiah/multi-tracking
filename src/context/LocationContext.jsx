@@ -1,7 +1,7 @@
 import * as Location from "expo-location";
 import { useToast } from "heroui-native";
 import { createContext, useCallback, useMemo, useState } from "react";
-import { Linking, Platform } from "react-native";
+import { Linking, Platform, ToastAndroid } from "react-native";
 
 export const LocationContext = createContext(null);
 
@@ -43,11 +43,11 @@ export function LocationProvider({ children }) {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (permission.status !== "granted") {
       if (permission.canAskAgain) {
-        toast.show({
-          variant: "warning",
-          label: "Location needed",
-          description: "A trip can't start without your location.",
-        });
+        // Android's own small message at the bottom, like "Copied".
+        ToastAndroid.show(
+          "A trip can't start without your location.",
+          ToastAndroid.LONG,
+        );
       } else {
         // "Don't ask again" was picked — only Settings can grant it now.
         toast.show({
@@ -94,11 +94,10 @@ export function LocationProvider({ children }) {
           // Shows Android's in-app "Turn on location?" dialog.
           await Location.enableNetworkProviderAsync();
         } catch {
-          toast.show({
-            variant: "warning",
-            label: "Location is off",
-            description: "Turn on location to start a trip.",
-          });
+          ToastAndroid.show(
+            "Turn on location to start a trip.",
+            ToastAndroid.LONG,
+          );
           return null;
         }
       } else {
@@ -125,11 +124,10 @@ export function LocationProvider({ children }) {
       setUserLngLat(lngLat);
       return lngLat;
     } catch {
-      toast.show({
-        variant: "danger",
-        label: "Couldn't find you",
-        description: "Please try again in a moment.",
-      });
+      ToastAndroid.show(
+        "Couldn't find you. Please try again in a moment.",
+        ToastAndroid.LONG,
+      );
       return null;
     } finally {
       setLocating(false);

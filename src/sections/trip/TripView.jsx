@@ -1,6 +1,5 @@
-import { useToast } from "heroui-native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Keyboard, View } from "react-native";
+import { Keyboard, ToastAndroid, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Show from "@/components/Show";
@@ -27,7 +26,6 @@ export default function TripView() {
   const toggleSatellite = useCallback(() => setSatellite((on) => !on), []);
   const showStreetMap = useCallback(() => setSatellite(false), []);
   const insets = useSafeAreaInsets();
-  const { toast } = useToast();
   // Where the map opens — read once so later GPS updates don't touch TripMap.
   const [initialCenter] = useState(() => userLngLat ?? DEFAULT_CENTER);
 
@@ -114,13 +112,10 @@ export default function TripView() {
         duration: 800,
       });
     } catch {
-      toast.show({
-        variant: "danger",
-        label: "Couldn't find a route",
-        description: "Check your connection and try again.",
-      });
+      // Android's own small message at the bottom, like "Copied".
+      ToastAndroid.show("Couldn't find a route", ToastAndroid.SHORT);
     }
-  }, [locateUser, findRoute, insets, toast]);
+  }, [locateUser, findRoute, insets]);
 
   return (
     <View className="flex-1">
