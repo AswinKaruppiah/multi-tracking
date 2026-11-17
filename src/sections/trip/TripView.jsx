@@ -46,14 +46,20 @@ export default function TripView() {
     });
   }, [userLngLat, following]);
 
-  // Brings the map back to the user after they've panned away. Checks first
-  // that permission is still given and the phone's location is on.
+  // Locate button: centres and zooms on the user once. Doesn't turn following
+  // on, so the map stays put when they move. Checks first that permission is
+  // still given and the phone's location is on.
   const centerOnUser = useCallback(async () => {
     const lngLat = await locateUser();
-    if (!lngLat) return;
-    setFollowing(true);
+    if (!lngLat) return null;
     cameraRef.current?.easeTo({ center: lngLat, zoom: 17, duration: 400 });
+    return lngLat;
   }, [locateUser]);
+
+  // Start: centre on the user and keep the map moving with them.
+  const startFollowing = useCallback(async () => {
+    if (await centerOnUser()) setFollowing(true);
+  }, [centerOnUser]);
 
   // Save the place and drop the pin. Stops following so the map doesn't
   // drift back to the user.
@@ -86,8 +92,8 @@ export default function TripView() {
     [goTo],
   );
 
-  // Typing pauses following, so GPS updates don't keep pulling the map back
-  // to the user while they search.
+  // Typing or moving the map by hand pauses following, so GPS updates don't
+  // keep pulling the map back to the user.
   const pauseFollowing = useCallback(() => setFollowing(false), []);
 
   // The search bar's X removes the pin (and with it, the route).
@@ -127,6 +133,7 @@ export default function TripView() {
         satellite={satellite}
         onLongPress={handleLongPress}
         onShowStreetMap={showStreetMap}
+        onUserMove={pauseFollowing}
       />
       <TripSearch
         destination={destination}
@@ -151,7 +158,7 @@ export default function TripView() {
             routeLoading={routeLoading}
             onDirections={showDirections}
             // No navigation yet: Start just goes back to following the user.
-            onStart={centerOnUser}
+            onStart={startFollowing}
           />
         </Show.If>
       </Show>

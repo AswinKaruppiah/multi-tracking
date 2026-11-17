@@ -22,6 +22,7 @@ function TripMap({
   satellite,
   onLongPress,
   onShowStreetMap,
+  onUserMove,
 }) {
   // Map rotation, so the heading cone still points the real-world direction.
   // A shared value: rotating the map doesn't re-render anything.
@@ -39,6 +40,15 @@ function TripMap({
   const handleRegionChange = useCallback(
     (event) => bearing.set(event.nativeEvent.bearing),
     [bearing],
+  );
+
+  // The user started dragging, pinching or rotating the map by hand — not one
+  // of the app's own camera moves (following, fitting a route).
+  const handleRegionWillChange = useCallback(
+    (event) => {
+      if (event.nativeEvent.userInteraction) onUserMove();
+    },
+    [onUserMove],
   );
 
   // Holding a finger on the map picks that spot as the destination.
@@ -59,6 +69,7 @@ function TripMap({
         compass={false}
         attribution={false}
         onLongPress={handleLongPress}
+        onRegionWillChange={handleRegionWillChange}
         onRegionIsChanging={handleRegionChange}
         onRegionDidChange={handleRegionChange}
       >
