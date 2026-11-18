@@ -15,7 +15,6 @@ function DestinationSheet({
   destination,
   routeLoading,
   onDirections,
-  onStart,
   onClear,
 }) {
   // Remember the last place, so the text stays while the sheet slides away.
@@ -55,27 +54,19 @@ function DestinationSheet({
             <BottomSheet.Close accessibilityLabel="Remove pin" />
           </View>
 
-          <View className="mt-4 flex-row gap-3">
-            <Pressable
-              onPress={onDirections}
-              disabled={routeLoading}
-              className="h-12 flex-1 flex-row items-center justify-center gap-2 rounded-full bg-brand-gray active:opacity-80"
-            >
-              <Route size={18} color="#000000" strokeWidth={1.75} />
-              <Text className="text-base text-brand-black">
-                <Show>
-                  <Show.If isTrue={routeLoading}>Finding…</Show.If>
-                  <Show.Else>Directions</Show.Else>
-                </Show>
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={onStart}
-              className="h-12 flex-1 items-center justify-center rounded-full bg-brand-black active:opacity-80"
-            >
-              <Text className="text-base text-brand-white">Start</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={onDirections}
+            disabled={routeLoading}
+            className="mt-4 h-12 flex-row items-center justify-center gap-2 rounded-full bg-brand-black active:opacity-80"
+          >
+            <Route size={18} color="#FFFFFF" strokeWidth={1.75} />
+            <Text className="text-base text-brand-white">
+              <Show>
+                <Show.If isTrue={routeLoading}>Finding…</Show.If>
+                <Show.Else>Directions</Show.Else>
+              </Show>
+            </Text>
+          </Pressable>
         </BottomSheet.Content>
       </BottomSheet.Portal>
     </BottomSheet>

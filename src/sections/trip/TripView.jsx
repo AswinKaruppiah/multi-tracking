@@ -13,8 +13,7 @@ import TripMap from "./map/TripMap";
 
 export default function TripView() {
   const { userLngLat, locateUser, watchUser } = useUserLocation();
-  const { cameraRef, centerOnUser, startFollowing, stopFollowing, fitRoute } =
-    useTripCamera({ userLngLat, locateUser });
+  const { cameraRef, centerOnUser, fitRoute } = useTripCamera({ locateUser });
 
   // { name, address, lngLat } of where the user wants to go.
   const [destination, setDestination] = useState(null);
@@ -42,17 +41,13 @@ export default function TripView() {
   useEffect(() => watchUser(), [watchUser]);
 
   // Long-press on the map drops a pin there.
-  const dropPin = useCallback(
-    ([lng, lat]) => {
-      stopFollowing();
-      setDestination({
-        name: "Dropped pin",
-        address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-        lngLat: [lng, lat],
-      });
-    },
-    [stopFollowing],
-  );
+  const dropPin = useCallback(([lng, lat]) => {
+    setDestination({
+      name: "Dropped pin",
+      address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+      lngLat: [lng, lat],
+    });
+  }, []);
 
   const clearDestination = useCallback(() => setDestination(null), []);
 
@@ -60,13 +55,12 @@ export default function TripView() {
   const showDirections = useCallback(async () => {
     const start = await locateUser();
     if (!start) return;
-    stopFollowing();
     try {
       fitRoute((await findRoute(start)).bounds);
     } catch {
       ToastAndroid.show("Couldn't find a route", ToastAndroid.SHORT);
     }
-  }, [locateUser, stopFollowing, findRoute, fitRoute]);
+  }, [locateUser, findRoute, fitRoute]);
 
   return (
     <View className="flex-1" onLayout={handleLayout}>
@@ -78,7 +72,6 @@ export default function TripView() {
         satellite={satellite}
         onLongPress={dropPin}
         onShowStreetMap={showStreetMap}
-        onUserMove={stopFollowing}
       />
       <MapButtons
         satellite={satellite}
@@ -93,8 +86,6 @@ export default function TripView() {
         routeLoading={routeLoading}
         onDirections={showDirections}
         onClear={clearDestination}
-        // No navigation yet: Start just goes back to following the user.
-        onStart={startFollowing}
       />
     </View>
   );
