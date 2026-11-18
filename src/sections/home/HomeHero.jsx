@@ -11,6 +11,14 @@ export default function HomeHero({ userLngLat }) {
       <Map
         mapStyle={MAP_STYLE}
         androidView="texture"
+        // Just a backdrop: no panning, zooming, rotating or tilting by hand.
+        // The camera below still moves to the user on its own.
+        dragPan={false}
+        touchZoom={false}
+        doubleTapZoom={false}
+        doubleTapHoldZoom={false}
+        touchRotate={false}
+        touchPitch={false}
         logo={false}
         compass={false}
         attribution={false}
