@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Keyboard, ToastAndroid, View } from "react-native";
+import { ToastAndroid, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Show from "@/components/Show";
@@ -11,7 +11,6 @@ import DestinationCard from "./DestinationCard";
 import LocateButton from "./LocateButton";
 import MapStyleButton from "./MapStyleButton";
 import TripMap from "./TripMap";
-import TripSearch from "./TripSearch";
 
 export default function TripView() {
   const { userLngLat, locateUser, watchUser } = useUserLocation();
@@ -61,42 +60,23 @@ export default function TripView() {
     if (await centerOnUser()) setFollowing(true);
   }, [centerOnUser]);
 
-  // Save the place and drop the pin. Stops following so the map doesn't
-  // drift back to the user.
-  const goTo = useCallback((place) => {
-    Keyboard.dismiss();
+  // Long-press on the map: the user picks the exact spot by hand. Stops
+  // following so the map doesn't drift back to the user.
+  const handleLongPress = useCallback((lngLat) => {
+    const [lng, lat] = lngLat;
     setFollowing(false);
-    setDestination(place);
+    setDestination({
+      name: "Dropped pin",
+      address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+      lngLat,
+    });
   }, []);
 
-  // Picked from search: the place may be off screen, so pan the map to it
-  // (same zoom). Long-press doesn't move — that spot is already in view.
-  const handleSelect = useCallback(
-    (place) => {
-      goTo(place);
-      cameraRef.current?.easeTo({ center: place.lngLat, duration: 600 });
-    },
-    [goTo],
-  );
-
-  // Long-press on the map: the user picks the exact spot by hand.
-  const handleLongPress = useCallback(
-    (lngLat) => {
-      const [lng, lat] = lngLat;
-      goTo({
-        name: "Dropped pin",
-        address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-        lngLat,
-      });
-    },
-    [goTo],
-  );
-
-  // Typing or moving the map by hand pauses following, so GPS updates don't
-  // keep pulling the map back to the user.
+  // Moving the map by hand pauses following, so GPS updates don't keep
+  // pulling the map back to the user.
   const pauseFollowing = useCallback(() => setFollowing(false), []);
 
-  // The search bar's X removes the pin (and with it, the route).
+  // The card's X removes the pin (and with it, the route).
   const clearDestination = useCallback(() => setDestination(null), []);
 
   // Directions: get the road route from the user to the destination, then fit
@@ -107,10 +87,10 @@ export default function TripView() {
     setFollowing(false); // so following doesn't pull the camera off the route
     try {
       const route = await findRoute(start);
-      // Room for the search bar on top and the card at the bottom.
+      // Room for the card at the bottom.
       cameraRef.current?.fitBounds(route.bounds, {
         padding: {
-          top: insets.top + 110,
+          top: insets.top + 50,
           bottom: insets.bottom + 200,
           left: 50,
           right: 50,
@@ -135,13 +115,6 @@ export default function TripView() {
         onShowStreetMap={showStreetMap}
         onUserMove={pauseFollowing}
       />
-      <TripSearch
-        destination={destination}
-        near={userLngLat}
-        onSelect={handleSelect}
-        onClear={clearDestination}
-        onType={pauseFollowing}
-      />
       {/* Map buttons, stacked bottom-left; lifted above the destination card. */}
       <View
         className={`absolute left-5 gap-3 ${
@@ -157,6 +130,7 @@ export default function TripView() {
             destination={destination}
             routeLoading={routeLoading}
             onDirections={showDirections}
+            onClear={clearDestination}
             // No navigation yet: Start just goes back to following the user.
             onStart={startFollowing}
           />
