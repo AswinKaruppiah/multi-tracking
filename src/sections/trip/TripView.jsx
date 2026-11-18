@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ToastAndroid, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Show from "@/components/Show";
 import { DEFAULT_CENTER } from "@/constants/map";
 import useRoute from "@/hooks/useRoute";
 import useUserLocation from "@/hooks/useUserLocation";
 
-import DestinationCard from "./DestinationCard";
-import LocateButton from "./LocateButton";
-import MapStyleButton from "./MapStyleButton";
+import DestinationSheet from "./DestinationSheet";
+import MapButtons from "./MapButtons";
 import TripMap from "./TripMap";
 
 export default function TripView() {
@@ -103,8 +102,17 @@ export default function TripView() {
     }
   }, [locateUser, findRoute, insets]);
 
+  // The sheet writes its top edge here on every frame, and with the screen
+  // height MapButtons works out how far to lift to stay above it.
+  const screenHeight = useSharedValue(0);
+  const sheetTop = useSharedValue(Number.MAX_SAFE_INTEGER); // closed
+  const handleLayout = useCallback(
+    (event) => screenHeight.set(event.nativeEvent.layout.height),
+    [screenHeight],
+  );
+
   return (
-    <View className="flex-1">
+    <View className="flex-1" onLayout={handleLayout}>
       <TripMap
         cameraRef={cameraRef}
         initialCenter={initialCenter}
@@ -115,27 +123,23 @@ export default function TripView() {
         onShowStreetMap={showStreetMap}
         onUserMove={pauseFollowing}
       />
-      {/* Map buttons, stacked bottom-left; lifted above the destination card. */}
-      <View
-        className={`absolute left-5 gap-3 ${
-          destination ? "bottom-safe-offset-44" : "bottom-safe-offset-5"
-        }`}
-      >
-        <MapStyleButton satellite={satellite} onPress={toggleSatellite} />
-        <LocateButton onPress={centerOnUser} />
-      </View>
-      <Show>
-        <Show.If isTrue={!!destination}>
-          <DestinationCard
-            destination={destination}
-            routeLoading={routeLoading}
-            onDirections={showDirections}
-            onClear={clearDestination}
-            // No navigation yet: Start just goes back to following the user.
-            onStart={startFollowing}
-          />
-        </Show.If>
-      </Show>
+      <MapButtons
+        satellite={satellite}
+        onToggleSatellite={toggleSatellite}
+        onLocate={centerOnUser}
+        sheetTop={sheetTop}
+        screenHeight={screenHeight}
+      />
+      {/* Always mounted: it opens and closes itself with `destination`. */}
+      <DestinationSheet
+        animatedPosition={sheetTop}
+        destination={destination}
+        routeLoading={routeLoading}
+        onDirections={showDirections}
+        onClear={clearDestination}
+        // No navigation yet: Start just goes back to following the user.
+        onStart={startFollowing}
+      />
     </View>
   );
 }
