@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { LocationContext } from "@/context/LocationContext";
+import { LocationContext } from "@/context/location/LocationContext";
 
 // { userLngLat, locating, locateUser, watchUser } — shared across all screens.
 export default function useUserLocation() {

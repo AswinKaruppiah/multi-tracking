@@ -8,7 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaListener } from 'react-native-safe-area-context';
 import { Uniwind } from 'uniwind';
 
-import { LocationProvider } from '@/context/LocationContext';
+import { LocationProvider } from '@/context/location/LocationContext';
 import { loadSatelliteStyle } from '@/services/satelliteStyle';
 import { fonts } from '@/styles/fonts';
 import { colors } from '@/styles/theme';
