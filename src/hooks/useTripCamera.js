@@ -25,7 +25,7 @@ export default function useTripCamera({ locateUser }) {
           top: insets.top + 50,
           bottom: sheetHeight + 50,
           left: 50,
-          right: 50,
+          right: 80,
         },
         duration: 800,
       });
