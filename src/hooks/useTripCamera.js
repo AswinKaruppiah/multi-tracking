@@ -15,13 +15,15 @@ export default function useTripCamera({ locateUser }) {
     cameraRef.current?.easeTo({ center: lngLat, zoom: 17, duration: 400 });
   }, [locateUser]);
 
-  // Zoom so the whole route is visible, with room for the sheet at the bottom.
+  // Zoom so all routes are visible above the sheet. `sheetHeight` is the
+  // sheet's measured content (it already includes the home-bar space); the
+  // extra 50 covers its drag handle plus a gap above it.
   const fitRoute = useCallback(
-    (bounds) => {
+    (bounds, sheetHeight) => {
       cameraRef.current?.fitBounds(bounds, {
         padding: {
           top: insets.top + 50,
-          bottom: insets.bottom + 200,
+          bottom: sheetHeight + 50,
           left: 50,
           right: 50,
         },

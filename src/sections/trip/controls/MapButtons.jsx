@@ -1,6 +1,7 @@
-import { memo } from "react";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { useTrip } from "@/context/trip/TripContext";
 
 import LocateButton from "./LocateButton";
 import MapStyleButton from "./MapStyleButton";
@@ -10,13 +11,9 @@ import MapStyleButton from "./MapStyleButton";
 // it. `sheetTop` (the sheet's top edge, from the top of the screen) and
 // `screenHeight` are shared values, so this runs on the UI thread with no
 // re-renders.
-function MapButtons({
-  satellite,
-  onToggleSatellite,
-  onLocate,
-  sheetTop,
-  screenHeight,
-}) {
+export default function MapButtons() {
+  const { satellite, toggleSatellite, centerOnUser, sheetTop, screenHeight } =
+    useTrip();
   const insets = useSafeAreaInsets();
   // Resting spot with no sheet: 20px above the home bar.
   const bottom = insets.bottom + 20;
@@ -32,10 +29,8 @@ function MapButtons({
     <Animated.View
       style={[{ position: "absolute", right: 20, bottom, gap: 12 }, liftStyle]}
     >
-      <MapStyleButton satellite={satellite} onPress={onToggleSatellite} />
-      <LocateButton onPress={onLocate} />
+      <MapStyleButton satellite={satellite} onPress={toggleSatellite} />
+      <LocateButton onPress={centerOnUser} />
     </Animated.View>
   );
 }
-
-export default memo(MapButtons);
