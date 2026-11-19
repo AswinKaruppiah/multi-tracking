@@ -7,6 +7,7 @@ import Show from "@/components/Show";
 import { TripPortalBridge, useTrip } from "@/context/trip/TripContext";
 
 import RouteOptions from "./RouteOptions";
+import RouteOptionsLoading from "./RouteOptionsLoading";
 import TravelModePicker from "./TravelModePicker";
 
 // Bottom sheet for the chosen destination. Opens when a pin is dropped;
@@ -68,9 +69,12 @@ export default function DestinationSheet() {
             <View className="mt-6 gap-2">
               <TravelModePicker />
               <Show>
-                <Show.If isTrue={!!routes}>
-                  <RouteOptions />
+                <Show.If isTrue={routeLoading}>
+                  <RouteOptionsLoading />
                 </Show.If>
+                <Show.ElseIf isTrue={!!routes}>
+                  <RouteOptions />
+                </Show.ElseIf>
               </Show>
             </View>
   
