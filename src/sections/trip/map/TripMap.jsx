@@ -1,10 +1,11 @@
 import { Camera, Map } from "@maplibre/maplibre-react-native";
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 import Show from "@/components/Show";
 import { MAP_STYLE } from "@/constants/map";
+import { useTrip } from "@/context/trip/TripContext";
 import useSatelliteStyle from "@/hooks/useSatelliteStyle";
 
 import DestinationMarker from "./DestinationMarker";
@@ -12,17 +13,20 @@ import RouteLine from "./RouteLine";
 import SatelliteStatus from "./SatelliteStatus";
 import UserMarker from "./UserMarker";
 
-// Memoized: re-renders only when the destination changes. GPS updates
-// re-render only UserMarker, never the map itself.
-function TripMap({
-  cameraRef,
-  initialCenter,
-  destination,
-  route,
-  satellite,
-  onLongPress,
-  onShowStreetMap,
-}) {
+// The map with the user, the pin and the routes. GPS updates re-render only
+// UserMarker, never the map itself.
+export default function TripMap() {
+  const {
+    cameraRef,
+    initialCenter,
+    destination,
+    routes,
+    selectedRoute,
+    satellite,
+    dropPin,
+    showStreetMap,
+  } = useTrip();
+
   // Map rotation, so the heading cone still points the real-world direction.
   // A shared value: rotating the map doesn't re-render anything.
   const bearing = useSharedValue(0);
@@ -43,8 +47,8 @@ function TripMap({
 
   // Holding a finger on the map picks that spot as the destination.
   const handleLongPress = useCallback(
-    (event) => onLongPress(event.nativeEvent.lngLat),
-    [onLongPress],
+    (event) => dropPin(event.nativeEvent.lngLat),
+    [dropPin],
   );
 
   return (
@@ -69,8 +73,8 @@ function TripMap({
 
         {/* `?.`: Show.If builds its children even when false. */}
         <Show>
-          <Show.If isTrue={!!route}>
-            <RouteLine geometry={route?.geometry} />
+          <Show.If isTrue={!!routes}>
+            <RouteLine routes={routes} selected={selectedRoute} />
           </Show.If>
         </Show>
         <Show>
@@ -86,12 +90,10 @@ function TripMap({
           <SatelliteStatus
             error={satelliteError}
             onRetry={retrySatellite}
-            onShowStreetMap={onShowStreetMap}
+            onShowStreetMap={showStreetMap}
           />
         </Show.If>
       </Show>
     </View>
   );
 }
-
-export default memo(TripMap);
